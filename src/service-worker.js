@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 const CACHE = "scrap-app-v1";
 const URLS = ["/", "/index.html", "/static/js/main.chunk.js"];
 
