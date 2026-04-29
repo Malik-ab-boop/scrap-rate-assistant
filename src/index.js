@@ -5,12 +5,10 @@ import App from './App';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
-// Register service worker for full offline support
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/service-worker.js')
-      .then((reg) => console.log('SW registered:', reg.scope))
-      .catch((err) => console.log('SW error:', err));
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function() { console.log('SW registered'); })
+      .catch(function() { console.log('SW failed'); });
   });
 }
