@@ -1,51 +1,31 @@
 /* eslint-disable */
+// This is a manual service worker - not using workbox
 
 const CACHE_NAME = "scrap-app-v3";
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        "/",
-        "/index.html",
-        "/manifest.json",
-        "/icon-192.png",
-        "/icon-512.png",
-      ]);
-    }).catch(() => {})
-  );
+self.addEventListener("install", function(event) {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      )
-    )
-  );
+self.addEventListener("activate", function(event) {
   self.clients.claim();
 });
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", function(event) {
   if (event.request.method !== "GET") return;
-
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(event.request).then(function(cached) {
       if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          if (!response || response.status !== 200) return response;
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, clone);
-          });
-          return response;
-        })
-        .catch(() => {
-          return caches.match("/index.html");
+      return fetch(event.request).then(function(response) {
+        if (!response || response.status !== 200) return response;
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(event.request, clone);
         });
+        return response;
+      }).catch(function() {
+        return caches.match("/index.html");
+      });
     })
   );
 });
