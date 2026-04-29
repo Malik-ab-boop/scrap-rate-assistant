@@ -1,8 +1,7 @@
-/* eslint-disable no-restricted-globals */
+/* eslint-disable */
 
 const CACHE_NAME = "scrap-app-v3";
 
-// Install - cache everything needed
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -18,7 +17,6 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate - clean old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -30,15 +28,12 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch - cache first, then network, always cache new responses
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET requests
   if (event.request.method !== "GET") return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
-
       return fetch(event.request)
         .then((response) => {
           if (!response || response.status !== 200) return response;
@@ -49,7 +44,6 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          // If offline and not cached, return index.html as fallback
           return caches.match("/index.html");
         });
     })
